@@ -10,7 +10,7 @@
 ## 1. Identificación del proyecto
 
 - **Nombre de la aplicación:** AlphaMetrics
-- **Equipo e integrantes:** Karol Clemente, Xiomara Gutierrez
+- **Equipo e integrantes:** Karol Clemente, Xiomara Gutierrez, Millerllay Velez
 - **Enlace a la aplicación:** [Pendiente / URL]
 - **Repositorio del proyecto:** [URL]
 - **Última actualización:** 2026-11-03
