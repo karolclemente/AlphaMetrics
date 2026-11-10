@@ -11,7 +11,7 @@
 
 - **Nombre de la aplicación:** AlphaMetrics
 - **Equipo e integrantes:** Karol Clemente, Xiomara Gutierrez, Millerllay Velez
-- **Enlace a la aplicación:** [Pendiente / URL]
+- **Enlace a la aplicación:** https://oecd-graphical-scsi-spirituality.trycloudflare.com/
 - **Repositorio del proyecto:** https://division-scholarship-renew-museums.trycloudflare.com/
 - **Última actualización:** 2026-11-03
 
