@@ -12,7 +12,7 @@
 - **Nombre de la aplicación:** AlphaMetrics
 - **Equipo e integrantes:** Karol Clemente, Xiomara Gutierrez, Millerllay Velez
 - **Enlace a la aplicación:** [Pendiente / URL]
-- **Repositorio del proyecto:** [URL]
+- **Repositorio del proyecto:** https://division-scholarship-renew-museums.trycloudflare.com/
 - **Última actualización:** 2026-11-03
 
 ## 2. ¿Qué queremos investigar? · S25
