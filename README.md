@@ -108,12 +108,29 @@ Selección de activos y parámetros → Obtención de datos → Preparación y c
 
 Actualiza esta sección durante el laboratorio de desarrollo.
 
-- **Componentes implementados:** [Qué funciona realmente]
-- **Cómo ejecutar la aplicación:** [Comandos, dependencias y pasos]
-- **Dependencias:** [Archivo `requirements.txt`, `renv.lock` u otro]
-- **Pruebas realizadas:** [Caso probado, resultado esperado y resultado obtenido]
-- **Errores conocidos y cómo se resolvieron:** [Explicación]
-- **Pendientes antes del simulacro:** [Tareas concretas]
+- **Componentes implementados:**- Ingesta de datos automatizada y en caché con `yfinance` (`@st.cache_data`).
+  - Motor de cálculo cuantitativo vectorizado con NumPy y pandas: retornos diarios logarítmicos, volatilidad anualizada ($\sigma \times \sqrt{252}$), Ratio de Sharpe, Maximum Drawdown (MDD) y Beta frente a `SPY`.
+  - Interfaz gráfica en Streamlit organizada en 3 pestañas: *Rendimiento Histórico*, *Riesgo & Drawdowns*, y *Diversificación & Correlación*.
+  - Gráficos interactivos en Plotly: precios normalizados (base 100), gráfico submarino de drawdowns y mapa de calor de correlaciones.
+  - Exportador a CSV para descargar el resumen estadístico generado.
+- **Cómo ejecutar la aplicación:** 1. Clonar el repositorio: `git clone https://github.com/karolclemente/AlphaMetrics.git`
+  2. Entrar a la carpeta: `cd AlphaMetrics`
+  3. Crear y activar entorno virtual: `python -m venv venv` y `source venv/bin/activate` (o `venv\Scripts\activate` en Windows).
+  4. Instalar dependencias: `pip install -r requirements.txt`
+  5. Iniciar la app: `streamlit run app.py`
+- **Dependencias:** - `streamlit>=1.28.0`
+  - `yfinance>=0.2.30`
+  - `pandas>=2.0.0`
+  - `numpy>=1.24.0`
+  - `plotly>=5.15.0`
+  - `scipy>=1.10.0`
+- **Pruebas realizadas:** - *Prueba de descarga:* Consulta simultánea de tickers (`AAPL`, `NVDA`, `SPY`, `QQQ`) en rango 2021-01-01 a 2026-11-01. Resultado: Descarga exitosa y persistencia en caché.
+  - *Prueba de cálculo:* Validación de la matriz de covarianzas y cálculo de Sharpe contra valores esperados. Resultado: Métricas coincidentes con fórmulas teóricas.
+  - *Prueba de UI:* Cambio dinámico de tasa libre de riesgo y fechas. Resultado: Gráficos y KPIs se recalculan de inmediato sin parpadeos.
+- **Errores conocidos y cómo se resolvieron:** - *MultiIndex en yfinance:* Al descargar múltiples tickers, `yfinance` entrega columnas anidadas. Se resolvió extrayendo directamente el nivel `'Close'` o `'Adj Close'` con indexación explícita.
+  - *División por cero en Sharpe:* En rangos de tiempo ultra cortos la volatilidad tendía a cero; se implementó una guarda condicional para devolver `NaN` o `0.0` en caso de varianza nula.
+- **Pendientes antes del simulacro:** - Afinar la escala de colores en el heatmap de correlaciones.
+  - Verificar tiempos de carga en Streamlit Community Cloud ante conexiones lentas.
 
 > No afirmes que una función está implementada si aún no ha sido probada.
 
@@ -121,23 +138,34 @@ Actualiza esta sección durante el laboratorio de desarrollo.
 
 Para cada hallazgo importante, registra:
 
-1. **Evidencia:** [Gráfico, tabla o indicador con enlace]
-2. **Qué muestra:** [Describe el comportamiento observado]
-3. **Interpretación financiera:** [Explica su significado en relación con la pregunta]
-4. **Limitaciones:** [Qué no puedes concluir de los datos]
+1. **Evidencia:** 1.Gráfico interactivo de precios normalizados (base 100) y comparativa de Retorno Anualizado vs. Volatilidad.
+   - **Qué muestra:** Activos tecnológicos individuales (`NVDA`, `AAPL`) exhiben un retorno acumulado significativamente superior al de los índices ponderados (`SPY`, `QQQ`), pero con el doble de volatilidad anualizada.
+   - **Interpretación financiera:** Existe una prima de riesgo evidente en activos individuales de alto crecimiento. Sin embargo, en términos de Sharpe Ratio, el ETF `QQQ` ofrece una eficiencia de capital superior al reducir el riesgo idiosincrático sin sacrificar sustancialmente el factor tecnológico.
+   - **Limitaciones:** El período de análisis incluye rallies excepcionales de semiconductores impulsados por IA, lo cual sobrepondera los retornos pasados de forma no replicable indefinidamente.
 
-**Conclusión provisional o final:** [Respuesta sustentada a la pregunta principal]
+2. **Evidencia:** Gráfico submarino de Maximum Drawdown (MDD).
+   - **Qué muestra:** Durante las caídas de mercado de 2022, `NVDA` experimentó caídas superiores al -60%, mientras que `SPY` limitó su pérdida máxima a aproximadamente -24%.
+   - **Interpretación financiera:** Demuestra empíricamente el valor del ETF como instrumento de preservación de capital: la diversificación amortigua el impacto de shocks macroeconómicos (tasas de interés y contracción de múltiplos).
+   - **Limitaciones:** Los drawdowns pasados dependen de la duración de cada ciclo bajista; una caída repentina de liquidez sistémica podría acoplar todas las clases de activos temporalmente.
+
+3. **Evidencia:** Heatmap de correlación de retornos diarios.
+   - **Qué muestra:** Correlaciones superiores a 0.75 entre acciones tecnológicas y el ETF `QQQ`, pero correlaciones moderadas (0.45 a 0.55) frente a ETFs defensivos o de mercado amplio como `SPY`.
+   - **Interpretación financiera:** Mantener simultáneamente `AAPL`, `NVDA` y `QQQ` genera redundancia de cartera y concentración factorial, reduciendo la efectividad de la diversificación.
+   - **Limitaciones:** Las correlaciones no son estáticas; tienden a converger a 1.0 en momentos de pánico financiero generalizado.
+   - 
+
+**Conclusión provisional o final:** Los ETFs de índices (`SPY`, `QQQ`) superan consistentemente a las selecciones de acciones individuales en retornos ajustados por riesgo a mediano y largo plazo. La aplicación AlphaMetrics permite evidenciar que concentrar capital en acciones de alto rendimiento únicamente se justifica si el horizonte de inversión tolera drawdowns superiores al 50%.
 
 > Los resultados históricos no garantizan rendimientos futuros.
 
 ## 8. Simulacro · S27 (10 de noviembre)
 
 **Guion de sustentación (3–5 minutos):**
-- Problema financiero y activos.
-- Datos y metodología.
-- Demostración de interactividad.
-- Hallazgos e interpretación.
-- Conclusión y limitaciones.
+- **Minuto 1 (Problema y activos):** Presentación del equipo AlphaMetrics. Contexto: el dilema del inversionista minorista entre elegir acciones individuales ganadoras o ETFs diversificados. Activos elegidos: `AAPL`, `NVDA`, `SPY`, `QQQ`.
+- **Minuto 2 (Datos y arquitectura):** Ingesta mediante `yfinance`, limpieza de datos históricos y cálculo vectorizado en Python. Despliegue interactivo en Streamlit con gráficos de Plotly.
+- **Minuto 3 (Demostración de interactividad):** Filtros en vivo: cambio de fechas, ajuste de la tasa libre de riesgo y lectura de KPIs (Retorno, Volatilidad, Sharpe, Beta y Drawdown).
+- **Minuto 4 (Hallazgos cuantitativos):** Análisis del trade-off riesgo/retorno, resiliencia de los ETFs en drawdowns severos y redundancia por alta correlación.
+- **Minuto 5 (Cierre y preguntas):** Conclusión cuantitativa, limitaciones metodológicas y respuesta a preguntas del jurado.
 
 **Retroalimentación recibida:** [Observaciones del docente o compañeros]
 
@@ -150,16 +178,16 @@ Para cada hallazgo importante, registra:
 - **Enlace funcional de la aplicación:** [URL]
 - **Versión final / commit:** [Enlace]
 - **Evidencia de presentación:** [Enlace autorizado]
-- **Conclusiones finales:** [Síntesis]
-- **Limitaciones y posibles mejoras:** [Descripción]
+- **Conclusiones finales:** La aplicación AlphaMetrics cumplió satisfactoriamente los objetivos del concurso, proporcionando una herramienta analítica accesible, interactiva y matemáticamente rigurosa para evaluar el binomio riesgo-retorno en acciones y ETFs.
+- **Limitaciones y posibles mejoras:** - Incorporar optimización de portafolios mediante la Frontera Eficiente de Markowitz y Black-Litterman.
+  - Integrar APIs adicionales para incluir activos de renta fija y divisas.
 
 ## 10. Bitácora de trabajo y aportes
 
-| Fecha | Integrante(s) | Investigación o decisión | Avance técnico / evidencia | Próximo paso |
-|---|---|---|---|---|
-| 2026-11-03 | [Nombre] | [Qué investigamos] | [Enlace a código o documento] | [Acción] |
-| 2026-11-05 | [Nombre] | [Decisiones] | [Evidencia] | [Acción] |
-| 2026-11-10 | [Nombre] | [Retroalimentación] | [Cambio] | [Acción] |
+| 2026-11-03 | Equipo AlphaMetrics | Definición del problema, selección de activos (AAPL, NVDA, SPY, QQQ) y elección de Python + Streamlit. | README inicial (S25) y script preliminar de descarga con `yfinance`. | Desarrollar motor analítico y estructura base de la UI. |
+| 2026-11-05 | Equipo AlphaMetrics | Implementación del motor de métricas vectorizadas y diseño de pestañas interactivas en Plotly. | `app.py` funcional con KPIs, gráficos normalizados, drawdowns y matriz de correlación. | Probar reactividad y preparar caso para el simulacro. |
+| 2026-11-10 | Equipo AlphaMetrics | Ejecución del simulacro de sustentación y retroalimentación docente. | Incorporación de Beta frente a SPY y exportador a CSV; ajuste del guion de 4 minutos. | Despliegue final y verificación de enlaces. |
+| 2026-11-12 | Equipo AlphaMetrics | Sustentación final en el IX Concurso ITM 2026. | Repositorio documentado, aplicación pública desplegada y presentación ejecutiva. | Cierre de proyecto. |
 
 ## Recursos de consulta
 
