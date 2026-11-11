@@ -58,7 +58,8 @@
 | Volatilidad Anualizada ($\sigma$) | Dispersión de los retornos alrededor de la media: $\sigma_{anual} = \sigma_{diaria} \times \sqrt{252}$. | Mide el riesgo total y la incertidumbre del activo en un horizonte estándar de un año bursátil. | src/analytics.py (función calculate_volatility) |
 | Ratio de Sharpe | [Retorno excedente por unidad de riesgo total: $S = \frac{R_p - R_f}{\sigma_p}$ (asumiendo tasa libre de riesgo $R_f$). | Evalúa si el rendimiento obtenido compensa el riesgo asumido respecto a un activo seguro. | src/analytics.py (función calculate_sharpe_ratio) |
 | Maximum Drawdown (MDD) | Caída porcentual máxima desde un pico histórico hasta su valle subsecuente: $MDD = \frac{P_{valle} - P_{pico}}{P_{pico}}$. | Cuantifica el peor escenario histórico de pérdida de capital, crucial para evaluar resiliencia de carteras. | src/analytics.py (función calculate_drawdown) |
-| Matriz de Correlación de Pearson | Grado de asociación lineal entre los retornos de cada par de activos: $\rho_{X,Y} = \frac{\operatorname{Cov}(X,Y)}{\sigma_X \sigma_Y}$. | Identifica el potencial de diversificación y reducción de riesgo no sistemático al combinar la cartera. | src/analytics.py (función correlation_matrix) |
+| Matriz de Correlación de Pearson | Grado de asociación lineal entre los retornos diarios de los activos (coeficiente de Pearson). | Identifica qué activos aportan verdadera diversificación y cuáles presentan redundancia en la cartera. | `analytics.py` / `df_returns.corr()` visualizado con mapa de calor. |
+
 
 No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y justifica únicamente los pertinentes.
 
@@ -66,8 +67,10 @@ No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y
 
 | Gráfico | Pregunta que ayuda a responder | Variables | Interpretación esperada |
 |---|---|---|---|
-| [Gráfico 1] | [Pregunta] | [Variables] | [Qué se podrá observar] |
-| [Gráfico 2] | [Pregunta] | [Variables] | [Qué se podrá comparar] |
+| **Rendimiento acumulado normalizado (Base 100)** | ¿Qué activo o ETF generó mayor ganancia acumulada en el horizonte de estudio? | Tiempo (días) vs. Precio normalizado ($P_t / P_0 \times 100$). | Comparar directamente el crecimiento de un dólar invertido en cada alternativa a partir de la misma base. |
+| **Gráfico submarino de Drawdowns** | ¿Cuándo y con qué profundidad ocurrieron las mayores caídas de capital en cada activo? | Tiempo (días) vs. Caída porcentual desde el máximo acumulado. | Observar visualmente cómo los ETFs amortiguan las caídas severas frente a caídas pronunciadas en acciones individuales. |
+| **Mapa de calor de correlación (Heatmap)** | ¿Qué nivel de cointegración/correlación existe entre las acciones y los índices de referencia? | Matriz simétrica de pares de activos con escala de -1 a 1. | Rastrear relaciones cercanas a 1.0 (redundancia) y valores moderados (potencial de diversificación). |
+| **Dispersión Riesgo vs. Retorno** | ¿Qué activo se posiciona en el cuadrante más eficiente de inversión? | Eje X: Volatilidad anualizada; Eje Y: Retorno anualizado. | Visualizar la frontera donde los activos con mayor retorno deberían justificar su nivel superior de riesgo. |
 
 **Primer resultado verificable:** [Enlace a un cálculo o gráfico realizado con datos reales y una interpretación breve]
 
@@ -76,26 +79,19 @@ No es necesario utilizar todos los indicadores estudiados en clase. Selecciona y
 **Investiga:** ¿cómo se construyen controles, gráficos y métricas con la herramienta elegida? ¿qué sucede cuando el usuario modifica una selección?
 
 - **Usuarios previstos:** Analistas financieros junior, estudiantes de ingeniería financiera, gestores de carteras minoristas y jurados evaluadores del concurso ITM.
-- **Entradas y filtros:** -Selector multiactivo (st.multiselect) para elegir entre acciones y ETFs disponibles.
-
--Selector de rango de fechas (st.date_input) para calibrar ventanas de tiempo específicas (ej. pre y post subida de tasas).
-
--Tasa libre de riesgo editable (st.number_input) para ajustar el cálculo dinámico del Ratio de Sharpe.
-
--Selector de benchmark de referencia (st.selectbox, por defecto SPY).
-
-- **Secciones de la interfaz:** [Sidebar: Controles globales de activos, fechas y parámetros financieros.
-
-Panel Principal - Resumen Ejecutivo: Tarjetas de métricas (st.metric) con Retorno Anualizado, Volatilidad, Sharpe y Max Drawdown.
-
-Pestaña 1 (Rendimiento Histórico): Gráfico interactivo en Plotly con precios normalizados y velas japonesas/volumen.
-
-Pestaña 2 (Análisis de Riesgo y Caídas): Gráficos de Drawdown submarino y distribución de retornos (histogramas/KDE).
-
-Pestaña 3 (Diversificación): Heatmap interactivo de correlación y matriz de covarianzas.
-
+- **Entradas y filtros:**
+  - Selector multiactivo (`st.multiselect`) para elegir entre acciones y ETFs disponibles.
+  - Selector de rango de fechas (`st.date_input`) para calibrar ventanas de tiempo específicas (ej. pre y post subida de tasas).
+  - Tasa libre de riesgo editable (`st.number_input`) para ajustar el cálculo dinámico del Ratio de Sharpe.
+  - Selector de benchmark de referencia (`st.selectbox`, por defecto `SPY`).
+- **Secciones de la interfaz:**
+  - Barra lateral (`st.sidebar`): Controles globales de activos, fechas y parámetros financieros.
+  - Panel Principal - Resumen Ejecutivo: Tarjetas de métricas (`st.metric`) con Retorno Anualizado, Volatilidad, Sharpe y Max Drawdown.
+  - Pestaña 1 (Rendimiento Histórico): Gráfico interactivo en Plotly con precios normalizados y velas japonesas/volumen.
+  - Pestaña 2 (Análisis de Riesgo y Caídas): Gráficos de Drawdown submarino y distribución de retornos (histogramas/KDE).
+  - Pestaña 3 (Diversificación): Heatmap interactivo de correlación y matriz de covarianzas.
 - **Resultados visibles:** Indicadores numéricos instantáneos (KPIs con deltas porcentuales), gráficos interactivos con zoom y tooltips mediante Plotly, y tablas comparativas de resumen estadístico exportables.
-- **Interacción principal:**Cuando el usuario cambia la fecha o agrega/elimina un activo en el selector lateral, Streamlit reejecuta reactivamente el flujo: filtra el DataFrame cacheado, recalcula vectorialmente la matriz de retornos y actualiza instantáneamente todos los gráficos y KPIs en pantalla sin recargar la página.
+- **Interacción principal:** Cuando el usuario cambia la fecha o agrega/elimina un activo en el selector lateral, Streamlit reejecuta reactivamente el flujo: filtra el DataFrame cacheado, recalcula vectorialmente todas las métricas y actualiza los gráficos interactivos sin recargar la página.
 
 **Flujo previsto:**  
 Selección de activos y parámetros → Obtención de datos → Preparación y cálculos → Visualización → Interpretación.
@@ -169,9 +165,14 @@ Para cada hallazgo importante, registra:
 
 **Retroalimentación recibida:** [Observaciones del docente o compañeros]
 
+- Se sugirió incluir el cálculo del Beta de cada activo frente al benchmark `SPY` directamente en la tabla resumen.
+- Añadir un botón rápido para exportar la tabla de métricas en formato CSV.
+
 | Ajuste necesario | Responsable | Estado |
 |---|---|---|
-| [Ajuste] | [Integrante] | [Pendiente / en proceso / resuelto] |
+| Implementar columna de Beta frente al benchmark | Equipo AlphaMetrics | Resuelto |
+| Añadir funcionalidad de descarga en CSV (`st.download_button`) | Equipo AlphaMetrics | Resuelto |
+| Revisar contraste visual de gráficos en modo oscuro | Equipo AlphaMetrics | Resuelto |
 
 ## 9. Presentación final · S28 (12 de noviembre)
 
@@ -183,7 +184,8 @@ Para cada hallazgo importante, registra:
   - Integrar APIs adicionales para incluir activos de renta fija y divisas.
 
 ## 10. Bitácora de trabajo y aportes
-
+| Fecha | Integrante(s) | Investigación o decisión | Avance técnico / evidencia | Próximo paso |
+|---|---|---|---|---|
 | 2026-11-03 | Equipo AlphaMetrics | Definición del problema, selección de activos (AAPL, NVDA, SPY, QQQ) y elección de Python + Streamlit. | README inicial (S25) y script preliminar de descarga con `yfinance`. | Desarrollar motor analítico y estructura base de la UI. |
 | 2026-11-05 | Equipo AlphaMetrics | Implementación del motor de métricas vectorizadas y diseño de pestañas interactivas en Plotly. | `app.py` funcional con KPIs, gráficos normalizados, drawdowns y matriz de correlación. | Probar reactividad y preparar caso para el simulacro. |
 | 2026-11-10 | Equipo AlphaMetrics | Ejecución del simulacro de sustentación y retroalimentación docente. | Incorporación de Beta frente a SPY y exportador a CSV; ajuste del guion de 4 minutos. | Despliegue final y verificación de enlaces. |
