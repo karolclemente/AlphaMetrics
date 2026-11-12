@@ -176,9 +176,9 @@ Para cada hallazgo importante, registra:
 
 ## 9. Presentación final · S28 (12 de noviembre)
 
-- **Enlace funcional de la aplicación:** [URL]
-- **Versión final / commit:** [Enlace]
-- **Evidencia de presentación:** [Enlace autorizado]
+- **Enlace funcional de la aplicación:** [https://describes-signing-melbourne-roof.trycloudflare.com/]
+- **Versión final / commit:** [https://describes-signing-melbourne-roof.trycloudflare.com/]
+- **Evidencia de presentación:** [https://describes-signing-melbourne-roof.trycloudflare.com/]
 - **Conclusiones finales:** La aplicación AlphaMetrics cumplió satisfactoriamente los objetivos del concurso, proporcionando una herramienta analítica accesible, interactiva y matemáticamente rigurosa para evaluar el binomio riesgo-retorno en acciones y ETFs.
 - **Limitaciones y posibles mejoras:** - Incorporar optimización de portafolios mediante la Frontera Eficiente de Markowitz y Black-Litterman.
   - Integrar APIs adicionales para incluir activos de renta fija y divisas.
